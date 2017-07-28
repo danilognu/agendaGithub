@@ -1,0 +1,11 @@
+<?php
+include("../../comum/comum.php");  
+include("../negocio-solicitacao.php"); 
+
+$loIdSolicitacao = $_REQUEST["id_solicitacao"];
+$loSolicitacao = new solicitacaoBO();
+$loRetrono = $loSolicitacao->EncaminharEmailAprovacao($loIdSolicitacao);
+
+echo json_encode($loRetrono);
+
+?>

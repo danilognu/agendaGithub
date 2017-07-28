@@ -1,0 +1,136 @@
+<?php
+
+class categoriaLocalidadesBOA{
+
+
+    public function Consultar($mbDados){
+
+
+        $loConexao = new Conexao();
+        $pdo = $loConexao->IniciaConexao();
+
+        if(strlen($mbDados) > 0){
+            $mbDados = " ".$mbDados;
+        }
+
+        $loSql = "SELECT 
+                        id_cat_localidade, 
+                        nome, 
+                        id_pessoa_matriz,   
+                        ativo                    
+                    FROM categoria_localidades 
+                    WHERE 1=1 ".$mbDados;
+
+
+        $query= $pdo->prepare($loSql);
+        $query->execute();    
+
+        $loSetores = null;
+        foreach ($query as $row) {
+               
+               
+               $loSetores[] = array(
+                     'id'              => $row["id_cat_localidade"] 
+                     ,'nome'                 => $row["nome"] 
+                     ,'id_pessoa_matriz'     => $row["id_pessoa_matriz"] 
+                     ,'ativo'                => $row["ativo"]
+                );
+               
+        
+        }
+
+        return $loSetores;        
+
+
+
+    }
+
+    public function Incluir($loDados){
+
+        $loNome = utf8_decode($loDados["nome"]); 
+
+
+        $loConexao = new Conexao();
+        $pdo = $loConexao->IniciaConexao();
+
+        $loSql = "INSERT INTO 
+                    categoria_localidades (
+                        nome, 
+                        id_usuario_cad,
+                        ativo,
+                        id_pessoa_matriz, 
+                        dt_cad                   
+                     ) VALUES (                        
+                         ?,?,?,?,NOW())";
+         
+        $query= $pdo->prepare($loSql);
+
+        $query->bindValue(1, $loNome); 
+        $query->bindValue(2, $_SESSION["id_usuario"]);
+        $query->bindValue(3, 1); 
+        $query->bindValue(4, $_SESSION["id_pessoa_matriz"]); 
+
+        $query->execute(); 
+
+        return true;
+
+
+    }
+
+    public function Alterar($loDados){
+
+
+        $loNome                 = utf8_decode($loDados["nome"]); 
+        $loAtivo                = $loDados["status"];
+        $loId                   = $loDados["id"];
+
+
+        $loConexao = new Conexao();
+        $pdo = $loConexao->IniciaConexao();
+
+        $loSql = "UPDATE categoria_localidades SET
+                        nome = ? ,
+                        dt_alt = ?,
+                        id_usuario_alt = ?,
+                        ativo = ?
+                WHERE id_cat_localidade = ? ";
+        
+        $query= $pdo->prepare($loSql);
+        $query->bindValue(1, $loNome); 
+        $query->bindValue(2, "NOW()"); 
+        $query->bindValue(3, $_SESSION["id_usuario"]);
+        $query->bindValue(4, $loAtivo);
+        $query->bindValue(5, $loId); 
+        $query->execute(); 
+
+        return true;         
+
+    }
+
+    public function VerificaLocalidadeUtilizada($mdDados){
+
+
+        
+        $loConexao = new Conexao();
+        $pdo = $loConexao->IniciaConexao();
+
+        $loId = $mdDados["id"];
+        $loSql = "SELECT COUNT(*) contagem FROM localidade WHERE id_cat_localidade = ".$loId." AND ativo = 1";
+        $query= $pdo->prepare($loSql);
+        $query->execute();    
+
+        $loContagem = 0;
+        foreach ($query as $row) {
+               
+            $loContagem = $row["contagem"];               
+        
+        }
+        return $loContagem;  
+
+    }
+
+   
+  
+
+}
+?>
