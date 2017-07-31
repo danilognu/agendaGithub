@@ -134,12 +134,12 @@ $loSolicitacao = new solicitacaoBO();
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="btn-group btn-group-sm btn-group-solid">
-                                                    <?php if ($loComumBO->VerificaItemArray($verificaPermissao,"A")) {   ?>
+                                                    <?php //if ($loComumBO->VerificaItemArray($verificaPermissao,"A")) {   ?>
                                                     <button id="btn-adicionar" class="btn dark"> Adicionar
                                                         
                                                         <i class="fa fa-plus"></i>
                                                     </button>
-                                                    <?php } ?>
+                                                    <?php //} ?>
                                                 </div>
                                             </div>
                                   

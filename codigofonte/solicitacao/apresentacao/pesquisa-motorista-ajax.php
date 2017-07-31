@@ -157,13 +157,39 @@ function marcardesmarcar(){
 
 function Adicionar(nome,id){
 
-    jQuery('#dialog-message').dialog('close');
-    //$("#nome-motorista").val(nome);
-    //$("#codigo-motorista").val(id);
 
-    $('#select-motorista option[value='+id+']').attr('selected','selected');
-    $("#select2-select-motorista-container").attr("title",nome);
-    $("#select2-select-motorista-container").text(nome);
+        var codigoMotorista = id;
+        $.ajax({
+                    data: {
+                        id_motorista: codigoMotorista
+                    }
+                    , type: "POST"
+                    , dataType: "json"
+                    , url: "valida-motorista-ajax.php"
+                    , success: function (retorno) {
+
+                        if(retorno.erro){
+
+                            bootbox.dialog({
+                                    message: retorno.messagem,
+                                    title: "Aviso",
+                                    buttons: {
+                                        success: {
+                                            label: "OK",
+                                            className: "dark"
+                                        }
+                                    }
+                            });    
+
+                        }else{
+                                jQuery('#dialog-message').dialog('close');
+                                $('#select-motorista option[value='+id+']').attr('selected','selected');
+                                $("#select2-select-motorista-container").attr("title",nome);
+                                $("#select2-select-motorista-container").text(nome);
+                        }
+                    }
+            });    
+
 
 }
 
