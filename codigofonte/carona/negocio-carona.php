@@ -1,6 +1,7 @@
 <?php
 include('persistencia-carona.php');
 require_once '../../comum/PHPMailer-master/class.phpmailer.php';
+require_once '../../comum/PHPMailer-master/PHPMailerAutoload.php';
 
 class caronaBO{
 
@@ -136,13 +137,19 @@ class caronaBO{
 
         // Instanciar a classe para envio de email
         $mail = new PHPMailer(true);
-
+        $mail->IsSMTP();
         // Vamos tentar realizar o envio
         try {
 
+           $loComumParametros = new comumBO();
+           $loDdEmail = $loComumParametros->ConfiguracaoHostEmail();
+
+            $mail->Host = $loDdEmail["HOST"];
+            $mail->Port = $loDdEmail["PORTA"]; 
+
             // Remetente
-            $mail->AddReplyTo('lets@Lets.com', utf8_decode('Solicitação de Carona'));
-            $mail->SetFrom('lets@Lets.com', utf8_decode('Solicitação de Carona'));
+            $mail->AddReplyTo($loDdEmail["EMAIL"], utf8_decode('Solicitação de Carona'));
+            $mail->SetFrom($loDdEmail["EMAIL"], utf8_decode('Solicitação de Carona'));
 
             // Destinatário
            // $mail->AddAddress($loEmail, 'Destinatário');

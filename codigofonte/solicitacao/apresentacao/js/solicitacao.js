@@ -860,7 +860,7 @@ Solicitacao = {};
                         };
                         
                         $("#dialog-message").dialog($.extend({
-                            title: "Caros Solicitadas"
+                            title: "Caronas Solicitadas"
                             , width: "80%"
                             , height: 400
                         }, optionsPadraoVisualizar));

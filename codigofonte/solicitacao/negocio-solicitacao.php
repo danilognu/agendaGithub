@@ -943,9 +943,10 @@ class solicitacaoBO{
                 $loMessagemHTML = "<strong> Solicitação de Número:</strong> $loIdSolicitacao <strong> foi Aprovada.  </strong>
                                 <p> <strong>Requisitante:</strong> ". $loNomeRequisitante . "  <strong> Codigo solicita&ccedil;&atilde;o: </strong> ".$loIdSolicitacao." <p>
                                 <p> <strong>Data Saida:</strong> ".$loDataSaida." <strong>Data Retorno:</strong> ".$loDataRetornoPrev." </p>
-                                <p> <strong>Finalidade:</strong> ".$loFinalidade." </p>
-                                <p> <strong>Origem:</strong> ".$loLocalidadeOrigem." </p>
-                                <p> <strong>Destino:</strong> ".$loLocalidadeDestinos." </p>";
+                                <p> <strong>Finalidade:</strong> ".$loFinalidade." </p>";
+
+                $loMessagemOrigmDestHTML  = " <p> <strong>Origem:</strong> ".$loLocalidadeOrigem." </p>
+                                              <p> <strong>Destino:</strong> ".$loLocalidadeDestinos." </p>";                               
 
             }
             if($mbStatus == "C"){ // Negado
@@ -953,13 +954,14 @@ class solicitacaoBO{
                  $loMessagemHTML = "<strong> Solicitação de Número:</strong> $loIdSolicitacao <strong> foi negada pelo gestor. </strong>
                                 <p> <strong>Requisitante:</strong> ". $loNomeRequisitante . "  <strong> Codigo solicita&ccedil;&atilde;o: </strong> ".$loIdSolicitacao." <p>
                                 <p> <strong>Data Saida:</strong> ".$loDataSaida." <strong>Data Retorno:</strong> ".$loDataRetornoPrev." </p>
-                                <p> <strong>Finalidade:</strong> ".$loFinalidade." </p>
-                                <p> <strong>Origem:</strong> ".$loLocalidadeOrigem." </p>
-                                <p> <strong>Destino:</strong> ".$loLocalidadeDestinos." </p>";
+                                <p> <strong>Finalidade:</strong> ".$loFinalidade." </p>";
+
+                $loMessagemOrigmDestHTML  = " <p> <strong>Origem:</strong> ".$loLocalidadeOrigem." </p>
+                                              <p> <strong>Destino:</strong> ".$loLocalidadeDestinos." </p>";                                
       
             }
 
-            $loMessagemHTML = utf8_decode($loMessagemHTML);
+            $loMessagemHTML = utf8_decode($loMessagemHTML).$loMessagemOrigmDestHTML;
             // Mensagem para clientes de email com suporte a HTML
             $mail->MsgHTML($loMessagemHTML);
 
