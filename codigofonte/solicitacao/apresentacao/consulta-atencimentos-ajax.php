@@ -90,10 +90,18 @@ if(count($loLista) > 0 ){
                 //echo "<td>".$loIndCarona.",".$loCaronaPendente."</td>";
                 if($loGrupoAcessoOperador == 1){
 
-                    $loDadosS = array("id_solicitacao" => $row["id_solicitacao"], 'status' => 'S' );
-                    $loRetornoS = $loSolicitacao->ListaCaronasSolicitadas($loDadosS);
+                   $loDadosS = array("id_solicitacao" => $row["id_solicitacao"], 'status' => 'S' );
+                   $loRetornoS = $loSolicitacao->ListaCaronasSolicitadas($loDadosS);
+                   $loBtnExibeCarona = false;
+                   if(count($loRetornoS) > 0){
+                       foreach ($loRetornoS as $loItemSolicCarona){
+                           if( $loItemSolicCarona["status"] == "" || $loItemSolicCarona["status"] == "S" ){
+                                $loBtnExibeCarona = true; 
+                           }
+                       }
+                   } 
 
-                   if( count($loRetornoS) > 0 && ($loRetornoS[0]["status"] == "" || $loRetornoS[0]["status"] == "S") ) {
+                   if( $loBtnExibeCarona ) {
                         echo " <td>  
                                 <div class='btn-group btn-group-sm btn-group-solid'>";
                                         echo  "<button value='".$row["id_solicitacao"]."' class='btn btn-success verificar-caronas'>Verificar <i class='fa fa-check'></i></button>";
