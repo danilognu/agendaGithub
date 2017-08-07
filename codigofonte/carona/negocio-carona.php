@@ -256,6 +256,15 @@ class caronaBO{
 
     }
 
+    public function ListaMotorista($loDados){
+        
+        $loCarona = new caronaBOA();
+        $loConsulta = $loCarona->ListaMotorista($loDados);
+
+        return $loConsulta;     
+
+    }    
+
     public function ListaDestino($loDados){
         
         $loCarona = new caronaBOA();

@@ -27,6 +27,7 @@ class caronaBOA{
                     ,(SELECT COUNT(*) FROM destinos WHERE destinos.id_solicitacao = solicitacao.id_solicitacao) as qtd_destinos
                     ,veiculo.placa
                     ,veiculo.qtd_passageiro as qtd_passageiro_veiculo
+                    ,motorista.id_pessoa as id_pessoa_motorista                    
                     ,motorista.nome as nome_motorista
                     ,solicitacao.id_localidade_origem
                     ,localidade.nome as nome_localidade_origem
@@ -59,12 +60,16 @@ class caronaBOA{
         $loItensConsulta = null;
         foreach ($query as $row) {
 
-                $loContaPassageiros = $row["qtd_passageiro_solicitacao"];
-                if($row["nome_motorista"] != "" && $row["qtd_passageiro_solicitacao"] > 0){
-                    $loContaPassageiros = $row["qtd_passageiro_solicitacao"];
-                    $loContaPassageiros++;
-                }
-               
+               $loContaPassageiros = 0;
+               $loListaPassageiros = $this->ListaPassageiros($row["id_solicitacao"]); 
+
+               if(count($loListaPassageiros) > 0 ){
+                    foreach ($loListaPassageiros as $rowPassageiros){
+                        $loContaPassageiros = $rowPassageiros["qtd_passageiros"]; 
+                    }
+               }
+               if($row["id_pessoa_motorista"] != ""){ $loContaPassageiros++; }
+              
                
                $loItensConsulta[] = array(
 
@@ -96,25 +101,17 @@ class caronaBOA{
     }
 
 
-
-    public function ListaPassageiros($mbIdSolicitacao){
+    public function ListaMotorista($mbIdSolicitacao){
 
         $loConexao = new Conexao();
         $pdo = $loConexao->IniciaConexao();        
 
-        $loSql = "SELECT 
-                    pessoa.nome
-                    ,1 as motorista 
-                 FROM solicitacao 
-                 INNER JOIN pessoa ON pessoa.id_pessoa = solicitacao.id_pessoa_motorista
-                 WHERE id_solicitacao = ".$mbIdSolicitacao."
-                    UNION 
-                SELECT 
-                    pessoa.nome 
-                    ,0 as motorista
-                FROM passageiros 
-                INNER JOIN pessoa ON pessoa.id_pessoa = passageiros.id_pessoa_passageiro
-                WHERE passageiros.id_solicitacao = ".$mbIdSolicitacao;
+        $loSql = "			SELECT 
+			    pessoa.id_pessoa
+			    ,pessoa.nome
+			 FROM solicitacao 
+			 INNER JOIN pessoa ON pessoa.id_pessoa = solicitacao.id_pessoa_motorista
+			 WHERE id_solicitacao = ".$mbIdSolicitacao;
         $query= $pdo->prepare($loSql);
         $query->execute();    
 
@@ -124,8 +121,46 @@ class caronaBOA{
                
                $loItensConsulta[] = array(
                      'nome' => $row["nome"] 
-                    ,'motorista' => $row["motorista"]
                 );   
+        }
+
+        return $loItensConsulta;            
+    }
+
+
+    public function ListaPassageiros($mbIdSolicitacao){
+
+        $loConexao = new Conexao();
+        $pdo = $loConexao->IniciaConexao();        
+
+        $loSql = " SELECT 
+                        pessoa.nome 
+                        ,0 as motorista
+                    FROM passageiros 
+                    INNER JOIN pessoa ON pessoa.id_pessoa = passageiros.id_pessoa_passageiro
+                    WHERE passageiros.id_solicitacao = ".$mbIdSolicitacao."
+                    AND passageiros.id_pessoa_passageiro NOT IN(
+                        SELECT 
+                            pessoa.id_pessoa
+                        FROM solicitacao 
+                        INNER JOIN pessoa ON pessoa.id_pessoa = solicitacao.id_pessoa_motorista
+                        WHERE id_solicitacao = ".$mbIdSolicitacao."
+                    )";
+        $query= $pdo->prepare($loSql);
+        $query->execute();    
+
+        $loItensConsulta = null;
+        $loContaPassageiro = 1;
+        foreach ($query as $row) {
+               
+               
+               $loItensConsulta[] = array(
+                     'nome' => $row["nome"] 
+                    ,'motorista' => $row["motorista"]
+                    ,'qtd_passageiros' => $loContaPassageiro
+                );   
+
+                $loContaPassageiro++;
         }
 
         return $loItensConsulta;         

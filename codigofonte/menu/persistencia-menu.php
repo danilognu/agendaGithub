@@ -8,31 +8,70 @@ class menuBOA{
         $loConexao = new Conexao();
         $pdo = $loConexao->IniciaConexao();
 
-        $loSql = "SELECT id_menu,id_menu_mae,nome,url,css_icon FROM menu WHERE id_menu_mae IS NULL AND ind_ativo = 1 ORDER BY ordenacao";
+
+        /*Verifica Permissão Pai ---------*/
+        $loSqlGrupo = "SELECT id_grupo FROM usuario WHERE id_usuario = ".$_SESSION["id_usuario"];
+        $queryGrupo = $pdo->prepare($loSqlGrupo);
+        $queryGrupo->execute();
+        $loIdGrupo = 0;
+        foreach ($queryGrupo as $rowGrupo) {
+            $loIdGrupo = $rowGrupo["id_grupo"];
+        }
+
+
+        $loSqlP = "SELECT id_menu,id_menu_mae,nome,url,css_icon FROM menu WHERE id_menu_mae IS NULL AND ind_ativo = 1 ORDER BY ordenacao ";
+        $queryP = $pdo->prepare($loSqlP);
+        $queryP->execute();
+        $loMontaStr = "";
+        foreach($queryP as $rowMenuLiberado){
+
+               $loLiberado = false; 
+               $loSqlVP = "SELECT COUNT(*) conta_acesso 
+                            FROM permissoes 
+                            WHERE permissoes.id_menu IN(SELECT id_menu FROM menu WHERE id_menu_mae = ".$rowMenuLiberado["id_menu"]." )  
+                            AND permissoes.id_grupo = ".$loIdGrupo." 
+                            AND permissoes.tipo = 'C'";
+               //echo $loSqlVP;
+               $queryVP = $pdo->prepare($loSqlVP);
+               $queryVP->execute();
+               foreach ($queryVP as $rowVP) {
+                    if($rowVP["conta_acesso"] > 0){
+                        $loLiberado = true;
+                    }
+               }
+
+               if($loLiberado){
+                    $loMontaStr .= $rowMenuLiberado["id_menu"].",";
+               }            
+        }
+
+        if($_SESSION["supervisor"]){ 
+            $loWhereIdMenu = "";
+        }else{
+            $loMontaStr = substr_replace($loMontaStr, '', -1);
+            $loWhereIdMenu = " AND id_menu IN(".$loMontaStr.")";
+        }
+
+        //Dados menu
+        $loSql = "SELECT id_menu,id_menu_mae,nome,url,css_icon FROM menu WHERE id_menu_mae IS NULL AND ind_ativo = 1 ".$loWhereIdMenu." ORDER BY ordenacao";
+        //echo $loSql;
         $query= $pdo->prepare($loSql);
         $query->execute();
 
         
-        
         foreach ($query as $row) {
-               
-               
-               $menu_itens[] = array(
-                    'id_menu'       =>$row['id_menu'] , 
-                    'id_menu_mae'   =>$row['id_menu_mae'], 
-                    'nome'          =>$row['nome'], 
-                    'url'           =>$row['url'],
-                    'css_icon'      =>$row['css_icon']
-                );
-               
+
+            $menu_itens[] = array(
+                'id_menu'       =>$row['id_menu'] , 
+                'id_menu_mae'   =>$row['id_menu_mae'], 
+                'nome'          =>$row['nome'], 
+                'url'           =>$row['url'],
+                'css_icon'      =>$row['css_icon']
+            );
 
         }
 
-        return $menu_itens;
-
-         
- 
-        
+       return $menu_itens;
 
     }
 

@@ -52,9 +52,10 @@ if(count($loLista) > 0 ){
 
         if($loLiberaSolicitacao){
 
-            $loQtd_passageiro_veiculo = $row["qtd_passageiro_veiculo"];
-            if($row["qtd_passageiro_veiculo"] == ""){ $loQtd_passageiro_veiculo = 0; }
-            $loQtdVagasDispVeiculo  = $loQtd_passageiro_veiculo-$row["qtd_passageiro_solicitacao"];
+            //$loQtd_passageiro_veiculo = $row["qtd_passageiro_veiculo"];
+            //if($row["qtd_passageiro_veiculo"] == ""){ $loQtd_passageiro_veiculo = 0; }
+            //$loQtdVagasDispVeiculo  = $loQtd_passageiro_veiculo-$row["qtd_passageiro_solicitacao"];
+            $loQtdVagasDispVeiculo = $row["qtd_passageiro_solicitacao"];
 
     ?>
 
@@ -65,35 +66,41 @@ if(count($loLista) > 0 ){
             <ul class="nav nav-tabs">
                     <li class="dropdown btn-group btn-group-sm btn-group-solid">
                         <a href="javascript:;" class="btn grey-mint dropdown-toggle" data-toggle="dropdown"> 
-                        <i class="fa fa-eye"></i> Qtd Disp:<?php echo $loQtdVagasDispVeiculo;?>                         
+                        <i class="fa fa-eye"></i> Qtd Pass:<?php echo $loQtdVagasDispVeiculo;?>                         
                         </a>
                         <ul class="dropdown-menu" role="menu">
 
                             <?php
                                 $loListaPassageiros = $loCarona->ListaPassageiros($row["id_solicitacao"]);
                                 if(count($loListaPassageiros) > 0 ){
+                                    echo "<li> <strong>Passageiros:</strong> </li>";
                                     foreach ($loListaPassageiros as $rowPassageiros){
 
-                                        if($rowPassageiros["motorista"] == 1){
+                                            ?> 
+                                            <li>
+                                                <a href="#tab_1_3" tabindex="-1" data-toggle="tab"> <?php echo  $rowPassageiros["nome"]; ?> </a>
+                                            </li>                                            
+                               <?php
+                                    }
+                                }
+                                ?>
+
+
+                            <?php
+                                $loListaMotorista = $loCarona->ListaMotorista($row["id_solicitacao"]);
+                                if(count($loListaMotorista) > 0 ){
+                                    foreach ($loListaMotorista as $rowMotorista){
+
                                             ?> 
                                             <li>
                                                 <strong>Motorista:</strong> <br /> 
-                                                <a href="#tab_1_3" tabindex="-1" data-toggle="tab"> <?php echo  $rowPassageiros["nome"]; ?> </a>
-                                                <strong>Passageiros:</strong> <br /> 
+                                                <a href="#tab_1_3" tabindex="-1" data-toggle="tab"> <?php echo  $rowMotorista["nome"]; ?> </a>
                                             </li>                                            
-                                            <?php
-                                        }else{
-                                            ?> 
-                                            <li>                                                
-                                                <a href="#tab_1_3" tabindex="-1" data-toggle="tab"> <?php echo  $rowPassageiros["nome"]; ?> </a>
-                                            </li>                                            
-                                            <?php
-                                        }
-                            ?>
-                            <?php
+                               <?php
                                     }
                                 }
                             ?>
+
                         </ul>
                     </li>
                 </ul>
